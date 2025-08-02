@@ -1,0 +1,55 @@
+script = { statement } ;
+statement = task_stmt | action_stmt | goal_stmt
+         | if_stmt | for_stmt | class_def | function_def
+         | function_call | trigger_stmt | import_stmt | connect_stmt | webhook_stmt | api_stmt ;
+
+task_stmt = "TASK" ":" text ;
+action_stmt = "ACTION" ":" text ;
+goal_stmt = "GOAL" ":" text ;
+
+if_stmt = "IF" condition "THEN" block [ "ELSE" block ] ;
+for_stmt = "FOR EACH" identifier "IN" identifier block ;
+
+class_def = "CLASS" identifier class_block ;
+class_block = { property_def } ;
+property_def = identifier ":" type ;
+
+function_def = "DEFINE FUNCTION" identifier "(" [ param_list ] ")" block ;
+param_list = identifier { "," identifier } ;
+
+function_call = "CALL" identifier "(" [ arg_list ] ")" ;
+arg_list = value { "," value } ;
+
+trigger_stmt = "ON" event_pattern block ;
+
+import_stmt = "IMPORT" string ;
+
+connect_stmt = "CONNECT TO" tool_type "AS" identifier connect_options ;
+tool_type = "n8n" | "webhook" | "api" | "queue" | "db" ;
+connect_options = "{" { connect_option } "}" ;
+connect_option = identifier ":" value ;
+
+webhook_stmt = "TRIGGER WEBHOOK" identifier "WITH" payload ;
+api_stmt = "CALL API" identifier "." endpoint "WITH" payload ;
+
+payload = "{" { identifier ":" value } "}" ;
+endpoint = identifier ;
+
+block = { statement } ;
+
+condition = identifier comparator value ;
+comparator = "=" | "!=" | "<" | ">" | "<=" | ">=" ;
+
+identifier = letter { letter | digit | "_" } ;
+type = "string" | "int" | "float" | "bool" ;
+value = string | number | identifier ;
+
+event_pattern = string | regex ;
+
+text = string ;
+string = '"' { character } '"' ;
+number = [ "-" ] digit { digit } ;
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+letter = "A" .. "Z" | "a" .. "z" ;
+character = ? any printable character except " ? ;
+regex = "/" { character } "/" ;

@@ -1,0 +1,15 @@
+# LMTagScript Interpreter Dependencies
+# Python 3.8+ required
+
+# No external dependencies required for basic functionality
+# The interpreter uses only standard library modules:
+# - re (regex)
+# - json
+# - sys
+# - os
+
+# Future dependencies (for planned features):
+# requests>=2.28.0  # For API calls
+# click>=8.0.0      # For CLI interface
+# colorama>=0.4.0   # For colored output
+# pyyaml>=6.0       # For YAML configuration 

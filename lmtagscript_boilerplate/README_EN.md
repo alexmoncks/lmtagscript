@@ -1,142 +1,281 @@
 # LMTagScript - Language Specification
 
-This directory contains the complete LMTagScript language specification, including grammar, documentation, and examples.
+**LMTagScript** is a domain-specific language (DSL) designed to orchestrate AI interactions with precision, structure, and modularity.
 
-## 📚 Content
+## 🧱 Basic Elements
 
-- **`grammar/`**: Formal syntax definition in EBNF
-- **`examples/`**: Practical usage examples
-- **`README.md`**: This documentation
-
-## 🔤 EBNF Grammar
-
-The complete grammar is defined in `grammar/LMtagscript.ebnf` and includes:
-
-### Basic Elements
-- **TAG**: Task, Action, Goal
-- **Identifiers**: Variable and function names
-- **Types**: string, int, float, bool
-- **Values**: Strings, numbers, identifiers
+### TAG - Task, Action, Goal
+```tagscript
+TASK: Generate product description
+ACTION: Use persuasive language and mention benefits
+GOAL: Help customers make informed buying decisions
+```
 
 ### Control Structures
-- **Conditionals**: IF/ELSE
-- **Loops**: FOR EACH
-- **Functions**: DEFINE FUNCTION and CALL
-- **Classes**: CLASS with properties
-
-### Integrations
-- **APIs**: CALL API
-- **Webhooks**: TRIGGER WEBHOOK
-- **Connections**: CONNECT TO
-- **Error Handling**: ON ERROR
-
-### Security
-- **Loopguard**: Infinite loop prevention
-- **Validation**: Type and syntax checking
-
-## 📖 Examples
-
-### Basic Example
 ```tagscript
-TASK: Greet the user
-ACTION: Use a friendly and concise tone
-GOAL: Make a good first impression
+IF condition = true THEN
+  TASK: Execute action
+  ACTION: Process data
+  GOAL: Obtain result
+ELSE
+  TASK: Alternative action
+  ACTION: Fallback
+  GOAL: Maintain functionality
+END
 
-CALL API welcome_service.send WITH {
-  name: "Alex",
-  language: "en"
+FOR EACH item IN collection DO
+  TASK: Process item
+  ACTION: Apply logic
+  GOAL: Transform data
+END
+```
+
+### External Integrations
+```tagscript
+CONNECT TO api AS service_name {
+  url: "https://api.example.com",
+  token: ENV("API_KEY")
+}
+
+CALL API service_name.endpoint WITH {
+  param1: "value1",
+  param2: "value2"
 }
 ```
 
-### Example with Flow Control
+### Security
 ```tagscript
-TASK: Process user input
-ACTION: Validate and respond
-GOAL: Provide helpful feedback
+LOOPGUARD {
+  max_depth: 3,
+  allow_repeat: false
+}
 
-IF user_type = "premium" THEN
-  TASK: Provide premium features
-  ACTION: Enable advanced options
-  GOAL: Enhance user experience
-ELSE
-  TASK: Show basic features
-  ACTION: Display standard options
-  GOAL: Guide to upgrade
+ON ERROR
+  TASK: Error handling
+  ACTION: Log and notification
+  GOAL: Maintain stability
+END
 ```
 
-### Example with Classes and Functions
+## 🔗 @ References for LLMs
+
+### Overview
+The `@` references allow LLMs to access tools and resources through methods permitted by platforms, bypassing security limitations for external links.
+
+### Reference Types
+
+#### @tool - Tools
 ```tagscript
-CLASS User
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+@tool:spreadsheet {
+  operation: "create",
+  template: "sales_report"
+}
+```
+
+#### @file - Files
+```tagscript
+@file:"/my-project/documents/report.pdf" {
+  permission: "read",
+  format: "text"
+}
+
+@file:"/templates/report-template.xlsx" {
+  copy_to: "/reports/",
+  name: "report-" + current_date
+}
+```
+
+#### @project - Projects
+```tagscript
+@project:lmtagscript {
+  access: "read",
+  include: ["docs", "examples"]
+}
+
+@project:analytics_dashboard {
+  components: ["charts", "tables"],
+  permissions: "write"
+}
+```
+
+#### @db - Databases
+```tagscript
+@db:analytics {
+  query: "SELECT * FROM sales WHERE date >= '2024-01-01'",
+  limit: 100
+}
+
+@db:user_profiles {
+  operation: "update",
+  where: "user_id = 12345"
+}
+```
+
+### API Integration
+```tagscript
+CALL API @tool:openai.chat WITH {
+  model: "gpt-4",
+  messages: [
+    {
+      role: "user",
+      content: "Analyze data from @db:analytics and generate insights"
+    }
+  ]
+}
+```
+
+### Usage in Loops
+```tagscript
+FOR EACH file IN @tool:google_drive.list_files DO
+  TASK: Process file
+  ACTION: Extract text and analyze
+  GOAL: Identify patterns
+  
+  @file:file.path {
+    extract_text: true,
+    save_to: "/processed/"
+  }
+END
+```
+
+### Error Handling
+```tagscript
+ON ERROR
+  TASK: Log access failure
+  ACTION: Try alternative method
+  GOAL: Ensure continuity
+  
+  @tool:backup_storage {
+    operation: "retrieve",
+    fallback: true
+  }
+END
+```
+
+## 📚 Advanced Examples
+
+### Classes and Functions
+```tagscript
+CLASS Product
   name: string
-  email: string
-  is_premium: bool
+  price: float
+  description: string
 
-DEFINE FUNCTION send_welcome(user)
-  TASK: Send welcome message
-  ACTION: Generate personalized greeting
-  GOAL: Create positive first impression
+DEFINE FUNCTION summarize(product)
+  TASK: Summarize product
+  ACTION: Highlight key features
+  GOAL: Prepare for marketing use
 
-CALL send_welcome(new_user)
+CALL summarize(prod1)
+```
+
+### Complete Example with @
+```tagscript
+TASK: Analyze Google Drive data
+ACTION: Use LLM-permitted tools
+GOAL: Extract insights from shared documents
+
+# Reference to file in Google Drive
+@file:"/my-project/documents/sales-report.pdf" {
+  permission: "read",
+  format: "text"
+}
+
+# Reference to specific tool
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+# Processing with multiple references
+TASK: Consolidate information
+ACTION: Combine data from different sources
+GOAL: Create unified report
+
+IF data_available = true THEN
+  @tool:spreadsheet {
+    operation: "create",
+    template: "sales_report"
+  }
+  
+  @file:"/templates/report-template.xlsx" {
+    copy_to: "/reports/",
+    name: "report-" + current_date
+  }
+ELSE
+  TASK: Notify error
+  ACTION: Send alert
+  GOAL: Maintain transparency
+END
 ```
 
 ## 🛠️ How to Use the Specification
 
 ### For Developers
-1. Read the EBNF grammar in `grammar/LMtagscript.ebnf`
-2. Study the examples in `examples/`
-3. Implement a parser following the specification
-4. Test with the provided examples
+1. **Implement Parser**: Use the EBNF grammar to create parsers
+2. **Add @ Support**: Implement LLM reference parsing
+3. **Integrate Tools**: Connect with permitted APIs and services
+4. **Test**: Validate with real usage examples
 
 ### For Users
-1. Familiarize yourself with the basic syntax
-2. Experiment with the examples
-3. Use the Python interpreter to test code
-4. Consult documentation for advanced features
+1. **Structure Workflows**: Use TAG to organize logic
+2. **Integrate Tools**: Use @ to access resources
+3. **Handle Errors**: Implement fallbacks and logging
+4. **Iterate**: Refine based on results
 
-## 🔮 Language Roadmap
+## 🚀 Language Roadmap
 
 ### Planned Features
-- [ ] Module and import support
-- [ ] Plugin system
-- [ ] Integration with more tools
-- [ ] Runtime type validation
-- [ ] Debugger and development tools
+- [ ] **Template Support**: Reusable macros and snippets
+- [ ] **Advanced Validation**: Type checking and linting
+- [ ] **Debugging**: Integrated debugging tools
+- [ ] **Performance**: Parsing and execution optimizations
+- [ ] **Extensibility**: Plugin system for tools
 
 ### Syntax Improvements
-- [ ] Comment support
-- [ ] Multi-line strings
-- [ ] More complex expressions
-- [ ] Macros and templates
+- [ ] **Regular Expressions**: Native regex support
+- [ ] **Advanced Operators**: Mathematical and logical
+- [ ] **Interpolation**: Dynamic strings with variables
+- [ ] **Modularization**: Import/export modules
 
 ## 📋 Conventions
 
 ### Naming
-- **Keywords**: Uppercase (TASK, ACTION, GOAL)
-- **Identifiers**: snake_case
-- **Classes**: PascalCase
-- **Constants**: UPPER_SNAKE_CASE
+- **TAG**: Always uppercase (TASK, ACTION, GOAL)
+- **Functions**: camelCase (summarize, processData)
+- **Classes**: PascalCase (Product, UserProfile)
+- **Variables**: snake_case (user_id, file_path)
 
 ### Formatting
-- Consistent indentation
-- Adequate spacing
-- Comments when necessary
-- Line breaks for readability
+- **Indentation**: 2 spaces
+- **Comments**: # for single line
+- **Strings**: Double quotes for consistency
+- **Parameters**: Spaces around operators
 
 ## 🤝 Contributing
 
-To contribute to the specification:
+### How to Contribute
+1. **Fork** the repository
+2. **Create** a branch for your feature
+3. **Implement** your changes
+4. **Test** with real examples
+5. **Document** new features
+6. **Open** a Pull Request
 
-1. **Propose improvements**: Open an issue discussing the change
-2. **Update grammar**: Modify the EBNF file
-3. **Add examples**: Create examples for new features
-4. **Test compatibility**: Verify existing examples still work
-
-## 📚 Additional Resources
-
-- [Python Interpreter](../lmtagscript_interpreter/)
-- [Main README](../../README.md)
-- [Contributing Guide](../../CONTRIBUTING.md)
+### Focus Areas
+- **Parser**: Improve complex syntax parsing
+- **@ References**: Expand supported tool types
+- **Integrations**: Add support for more APIs
+- **Documentation**: Examples and tutorials
+- **Tools**: IDEs, debuggers, validators
 
 ---
 
-**LMTagScript Specification** - Defining the universal language for AI orchestration. 
+**LMTagScript** - Orchestrating AI with clarity and control through intelligent @ references. 

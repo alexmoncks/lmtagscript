@@ -10,6 +10,7 @@ This is the official initial interpreter for the TagScript language, implemented
 - **API Calls**: Native syntax for integrations
 - **Error Handling**: ON ERROR blocks
 - **Security**: Loopguard to prevent infinite loops
+- **@ References**: Support for LLM tool references
 
 ## 📋 Prerequisites
 
@@ -52,7 +53,7 @@ ON ERROR
   GOAL: Prevent loss of order
 ```
 
-### Example JSON Output
+### JSON Output Example
 
 ```json
 {
@@ -88,7 +89,7 @@ ON ERROR
 The main file contains:
 
 - **Regex Patterns**: To identify TagScript elements
-- **parse_tags() function**: Converts code to data structure
+- **parse_tagscript() function**: Converts code to data structure
 - **Element Extraction**: TAG, classes, functions, conditionals, etc.
 
 ### Supported Elements
@@ -101,6 +102,7 @@ The main file contains:
 - ✅ **APIs**: CALL API
 - ✅ **Errors**: ON ERROR
 - ✅ **Security**: LOOPGUARD
+- ✅ **@ References**: LLM tool access
 
 ## 🧪 Testing
 
@@ -113,7 +115,7 @@ The main file contains:
 
 - [ ] More robust syntax validation
 - [ ] Support for more data types
-- [ ] Real API integration
+- [ ] Integration with real APIs
 - [ ] Command line interface
 - [ ] Web playground
 

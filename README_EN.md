@@ -13,9 +13,11 @@ To define a universal language for AI prompting, process orchestration, and tool
 - **Control**: Conditionals, loops, triggers, error handling
 - **Connectivity**: Native syntax for APIs, n8n, webhooks, databases
 - **Safety**: Loopguard, validation, retry/fallback
+- **@ References**: Direct access to LLM tools
 
 ## 🔤 Syntax Overview
 
+### Basic TAG Structure
 ```tagscript
 TASK: Generate product description
 ACTION: Use persuasive language and mention benefits
@@ -34,8 +36,97 @@ DEFINE FUNCTION summarize(product)
 CALL summarize(prod1)
 ```
 
+### Flow Control
+```tagscript
+IF stock_available = true THEN
+  TASK: Process payment
+  ACTION: Call payment API
+  GOAL: Complete transaction
+ELSE
+  TASK: Notify user
+  ACTION: Send out-of-stock message
+  GOAL: Inform and retain customer
+END
+
+FOR EACH item IN cart DO
+  TASK: Check availability
+  ACTION: Query inventory system
+  GOAL: Determine stock level
+END
+```
+
+## 🔗 @ References for LLMs
+
+### Overview
+The `@` references allow LLMs to access tools and resources through methods permitted by platforms, bypassing security limitations for external links.
+
+### Reference Types
+
+#### @tool - Tools and Services
+```tagscript
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+@tool:spreadsheet {
+  operation: "create",
+  template: "sales_report"
+}
+
+@tool:email_service {
+  template: "notification",
+  recipients: ["user@example.com"]
+}
+```
+
+#### @file - Files and Documents
+```tagscript
+@file:"/documents/report.pdf" {
+  permission: "read",
+  format: "text"
+}
+
+@file:"/templates/template.xlsx" {
+  copy_to: "/output/",
+  name: "report_2024"
+}
+```
+
+#### @project - Projects and Repositories
+```tagscript
+@project:analytics_dashboard {
+  access: "read",
+  include: ["charts", "tables"]
+}
+
+@project:sales_crm {
+  access: "read_write",
+  components: ["leads", "deals"]
+}
+```
+
+#### @db - Databases
+```tagscript
+@db:sales_database {
+  query: "SELECT * FROM sales WHERE date >= '2024-01-01'",
+  limit: 100
+}
+
+@db:analytics_db {
+  operation: "update",
+  table: "metrics",
+  values: {
+    "total_revenue": 50000,
+    "conversion_rate": 0.15
+  }
+}
+```
+
 ## 🔌 External Integration Example
 
+### Traditional APIs
 ```tagscript
 CONNECT TO api AS stock_checker {
   url: "https://api.example.com/check",
@@ -51,6 +142,19 @@ ON ERROR
   GOAL: Maintain reliability
 ```
 
+### LLM Integration via @
+```tagscript
+CALL API @tool:openai.chat WITH {
+  model: "gpt-4",
+  messages: [
+    {
+      role: "user",
+      content: "Analyze data from @db:sales_database and generate insights"
+    }
+  ]
+}
+```
+
 ## 🔐 Safety & Reliability
 
 ```tagscript
@@ -58,6 +162,17 @@ LOOPGUARD {
   max_depth: 3,
   allow_repeat: false
 }
+
+ON ERROR
+  TASK: Implement robust fallback
+  ACTION: Use backup data and notify team
+  GOAL: Maintain process continuity
+  
+  @tool:backup_storage {
+    operation: "retrieve",
+    fallback: true
+  }
+END
 ```
 
 ## 📁 Project Structure
@@ -67,10 +182,14 @@ lmtagscript/
 ├── lmtagscript_boilerplate/     # Language specification
 │   ├── grammar/                 # EBNF grammar
 │   ├── examples/                # Usage examples
+│   │   ├── comprehensive_llm_example.tag
+│   │   ├── simple_llm_example.tag
+│   │   └── llm_references_example.tag
 │   └── README.md               # Specification documentation
 ├── lmtagscript_interpreter/     # Python interpreter
 │   ├── main.py                 # Main parser
 │   ├── input.tag               # Example file
+│   ├── test_comprehensive.py   # Test script
 │   └── README.md               # Interpreter documentation
 └── README.md                   # This file
 ```
@@ -93,29 +212,101 @@ lmtagscript/
 
 4. The result will be displayed as structured JSON
 
-### Example Output
+### Complete Example with @ References
+
+```tagscript
+TASK: Create automated sales report
+ACTION: Collect data from multiple sources and generate analysis
+GOAL: Provide actionable insights for the sales team
+
+# Access Google Drive
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+# Read historical data
+@file:"/data/historical_sales.csv" {
+  permission: "read",
+  format: "csv"
+}
+
+# Query database
+@db:sales_database {
+  query: "SELECT * FROM sales WHERE date >= '2024-01-01'",
+  limit: 1000
+}
+
+# Conditional processing
+IF data_quality_score >= 0.8 THEN
+  @tool:data_processor {
+    operation: "clean_and_validate",
+    input: @db:sales_database,
+    output: @file:"/processed/clean_data.json"
+  }
+ELSE
+  @tool:data_collector {
+    sources: ["crm", "website"],
+    timeframe: "last_7_days"
+  }
+END
+
+# AI analysis
+CALL API @tool:openai.chat WITH {
+  model: "gpt-4",
+  messages: [
+    {
+      role: "user",
+      content: "Analyze the data and generate an executive report"
+    }
+  ]
+}
+
+# Save result
+@file:"/reports/final_report.pdf" {
+  permission: "write",
+  format: "pdf"
+}
+```
+
+### JSON Output Example
 
 ```json
 {
-  "task": "Process purchase",
-  "action": "Validate user and stock",
-  "goal": "Complete the order",
-  "api_call": {
-    "service": "purchase_api",
-    "endpoint": "finalize",
-    "payload": {
-      "user_id": "12345"
-    }
-  },
-  "if_blocks": [
+  "task": "Create automated sales report",
+  "action": "Collect data from multiple sources and generate analysis",
+  "goal": "Provide actionable insights for the sales team",
+  "llm_references": [
     {
-      "condition": {
-        "left": "stock_available",
-        "operator": "=",
-        "right": "true"
+      "type": "tool",
+      "tool": "google_drive",
+      "parameters": {
+        "action": "list_files",
+        "folder": "1ABC123DEF456",
+        "filter": "pdf"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/data/historical_sales.csv",
+      "parameters": {
+        "permission": "read",
+        "format": "csv"
+      }
+    }
+  ],
+  "api_calls": [
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "openai.chat"
       },
-      "then": "TASK: Proceed to payment...",
-      "else": "TASK: Notify user..."
+      "payload": {
+        "model": "gpt-4",
+        "messages": "..."
+      }
     }
   ]
 }
@@ -129,6 +320,9 @@ lmtagscript/
 - [ ] Plugin system for tools (n8n, OpenAI, ElevenLabs)
 - [ ] CLI runner for batch execution
 - [ ] Integration with Supabase, Vercel, Cloudflare Workers
+- [ ] Support for more @ reference types
+- [ ] Advanced syntax validation
+- [ ] Integrated debugger
 
 ## 🤝 Contributing
 
@@ -152,6 +346,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Grammar Specification](lmtagscript_boilerplate/grammar/LMtagscript.ebnf)
 - [Usage Examples](lmtagscript_boilerplate/examples/)
 - [Interpreter Documentation](lmtagscript_interpreter/README.md)
+- [@ References Guide](lmtagscript_boilerplate/README_EN.md#-references-for-llms)
 
 ## ⭐ Stars and Support
 
@@ -172,4 +367,4 @@ See more details in [SPONSOR.md](SPONSOR.md)
 
 ---
 
-**LMTagScript** - Orchestrating AI with clarity and control. 
+**LMTagScript** - Orchestrating AI with clarity and control through intelligent @ references. 

@@ -13,9 +13,11 @@ Definir uma linguagem universal para prompts de IA, orquestração de processos 
 - **Controle**: Condicionais, loops, triggers, tratamento de erros
 - **Conectividade**: Sintaxe nativa para APIs, n8n, webhooks, bancos de dados
 - **Segurança**: Loopguard, validação, retry/fallback
+- **Referências @**: Acesso direto a ferramentas LLM
 
 ## 🔤 Visão Geral da Sintaxe
 
+### Estrutura Básica TAG
 ```tagscript
 TASK: Gerar descrição do produto
 ACTION: Usar linguagem persuasiva e mencionar benefícios
@@ -34,8 +36,97 @@ DEFINE FUNCTION summarize(product)
 CALL summarize(prod1)
 ```
 
+### Controle de Fluxo
+```tagscript
+IF stock_available = true THEN
+  TASK: Processar pagamento
+  ACTION: Chamar API de pagamento
+  GOAL: Finalizar transação
+ELSE
+  TASK: Notificar usuário
+  ACTION: Enviar mensagem de estoque esgotado
+  GOAL: Informar e reter cliente
+END
+
+FOR EACH item IN cart DO
+  TASK: Verificar disponibilidade
+  ACTION: Consultar sistema de inventário
+  GOAL: Determinar nível de estoque
+END
+```
+
+## 🔗 Referências @ para LLMs
+
+### Visão Geral
+As referências `@` permitem que LLMs acessem ferramentas e recursos através de métodos permitidos pelas plataformas, contornando limitações de segurança para links externos.
+
+### Tipos de Referências
+
+#### @tool - Ferramentas e Serviços
+```tagscript
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+@tool:spreadsheet {
+  operation: "create",
+  template: "sales_report"
+}
+
+@tool:email_service {
+  template: "notification",
+  recipients: ["user@example.com"]
+}
+```
+
+#### @file - Arquivos e Documentos
+```tagscript
+@file:"/documents/report.pdf" {
+  permission: "read",
+  format: "text"
+}
+
+@file:"/templates/template.xlsx" {
+  copy_to: "/output/",
+  name: "report_2024"
+}
+```
+
+#### @project - Projetos e Repositórios
+```tagscript
+@project:analytics_dashboard {
+  access: "read",
+  include: ["charts", "tables"]
+}
+
+@project:sales_crm {
+  access: "read_write",
+  components: ["leads", "deals"]
+}
+```
+
+#### @db - Bancos de Dados
+```tagscript
+@db:sales_database {
+  query: "SELECT * FROM sales WHERE date >= '2024-01-01'",
+  limit: 100
+}
+
+@db:analytics_db {
+  operation: "update",
+  table: "metrics",
+  values: {
+    "total_revenue": 50000,
+    "conversion_rate": 0.15
+  }
+}
+```
+
 ## 🔌 Exemplo de Integração Externa
 
+### APIs Tradicionais
 ```tagscript
 CONNECT TO api AS stock_checker {
   url: "https://api.example.com/check",
@@ -51,6 +142,19 @@ ON ERROR
   GOAL: Manter confiabilidade
 ```
 
+### Integração com LLMs via @
+```tagscript
+CALL API @tool:openai.chat WITH {
+  model: "gpt-4",
+  messages: [
+    {
+      role: "user",
+      content: "Analise os dados de @db:sales_database e gere insights"
+    }
+  ]
+}
+```
+
 ## 🔐 Segurança e Confiabilidade
 
 ```tagscript
@@ -58,6 +162,17 @@ LOOPGUARD {
   max_depth: 3,
   allow_repeat: false
 }
+
+ON ERROR
+  TASK: Implementar fallback robusto
+  ACTION: Usar dados de backup e notificar equipe
+  GOAL: Manter continuidade do processo
+  
+  @tool:backup_storage {
+    operation: "retrieve",
+    fallback: true
+  }
+END
 ```
 
 ## 📁 Estrutura do Projeto
@@ -67,10 +182,14 @@ lmtagscript/
 ├── lmtagscript_boilerplate/     # Especificação da linguagem
 │   ├── grammar/                 # Gramática EBNF
 │   ├── examples/                # Exemplos de uso
+│   │   ├── comprehensive_llm_example.tag
+│   │   ├── simple_llm_example.tag
+│   │   └── llm_references_example.tag
 │   └── README.md               # Documentação da especificação
 ├── lmtagscript_interpreter/     # Interpretador Python
 │   ├── main.py                 # Parser principal
 │   ├── input.tag               # Arquivo de exemplo
+│   ├── test_comprehensive.py   # Script de teste
 │   └── README.md               # Documentação do interpretador
 └── README.md                   # Este arquivo
 ```
@@ -93,29 +212,101 @@ lmtagscript/
 
 4. O resultado será exibido em JSON estruturado
 
-### Exemplo de Saída
+### Exemplo Completo com Referências @
+
+```tagscript
+TASK: Criar relatório de vendas automatizado
+ACTION: Coletar dados de múltiplas fontes e gerar análise
+GOAL: Fornecer insights acionáveis para a equipe de vendas
+
+# Acessar Google Drive
+@tool:google_drive {
+  action: "list_files",
+  folder: "1ABC123DEF456",
+  filter: "pdf"
+}
+
+# Ler dados históricos
+@file:"/data/historical_sales.csv" {
+  permission: "read",
+  format: "csv"
+}
+
+# Consultar banco de dados
+@db:sales_database {
+  query: "SELECT * FROM sales WHERE date >= '2024-01-01'",
+  limit: 1000
+}
+
+# Processamento condicional
+IF data_quality_score >= 0.8 THEN
+  @tool:data_processor {
+    operation: "clean_and_validate",
+    input: @db:sales_database,
+    output: @file:"/processed/clean_data.json"
+  }
+ELSE
+  @tool:data_collector {
+    sources: ["crm", "website"],
+    timeframe: "last_7_days"
+  }
+END
+
+# Análise com IA
+CALL API @tool:openai.chat WITH {
+  model: "gpt-4",
+  messages: [
+    {
+      role: "user",
+      content: "Analise os dados e gere um relatório executivo"
+    }
+  ]
+}
+
+# Salvar resultado
+@file:"/reports/final_report.pdf" {
+  permission: "write",
+  format: "pdf"
+}
+```
+
+### Exemplo de Saída JSON
 
 ```json
 {
-  "task": "Process purchase",
-  "action": "Validate user and stock",
-  "goal": "Complete the order",
-  "api_call": {
-    "service": "purchase_api",
-    "endpoint": "finalize",
-    "payload": {
-      "user_id": "12345"
-    }
-  },
-  "if_blocks": [
+  "task": "Criar relatório de vendas automatizado",
+  "action": "Coletar dados de múltiplas fontes e gerar análise",
+  "goal": "Fornecer insights acionáveis para a equipe de vendas",
+  "llm_references": [
     {
-      "condition": {
-        "left": "stock_available",
-        "operator": "=",
-        "right": "true"
+      "type": "tool",
+      "tool": "google_drive",
+      "parameters": {
+        "action": "list_files",
+        "folder": "1ABC123DEF456",
+        "filter": "pdf"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/data/historical_sales.csv",
+      "parameters": {
+        "permission": "read",
+        "format": "csv"
+      }
+    }
+  ],
+  "api_calls": [
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "openai.chat"
       },
-      "then": "TASK: Proceed to payment...",
-      "else": "TASK: Notify user..."
+      "payload": {
+        "model": "gpt-4",
+        "messages": "..."
+      }
     }
   ]
 }
@@ -129,6 +320,9 @@ lmtagscript/
 - [ ] Sistema de plugins para ferramentas (n8n, OpenAI, ElevenLabs)
 - [ ] CLI runner para execução em lote
 - [ ] Integração com Supabase, Vercel, Cloudflare Workers
+- [ ] Suporte a mais tipos de referências @
+- [ ] Validação avançada de sintaxe
+- [ ] Debugger integrado
 
 ## 🤝 Contribuindo
 
@@ -152,6 +346,7 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 - [Especificação da Gramática](lmtagscript_boilerplate/grammar/LMtagscript.ebnf)
 - [Exemplos de Uso](lmtagscript_boilerplate/examples/)
 - [Documentação do Interpretador](lmtagscript_interpreter/README.md)
+- [Guia de Referências @](lmtagscript_boilerplate/README.md#-referências--para-llms)
 
 ## ⭐ Estrelas e Apoio
 
@@ -172,4 +367,4 @@ Veja mais detalhes em [SPONSOR.md](SPONSOR.md)
 
 ---
 
-**LMTagScript** - Orquestrando IA com clareza e controle. 
+**LMTagScript** - Orquestrando IA com clareza e controle através de referências @ inteligentes. 

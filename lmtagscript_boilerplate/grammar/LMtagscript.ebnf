@@ -1,55 +1,80 @@
-script = { statement } ;
-statement = task_stmt | action_stmt | goal_stmt
-         | if_stmt | for_stmt | class_def | function_def
-         | function_call | trigger_stmt | import_stmt | connect_stmt | webhook_stmt | api_stmt ;
+(* LMTagScript Grammar - Extended Backus-Naur Form *)
 
-task_stmt = "TASK" ":" text ;
-action_stmt = "ACTION" ":" text ;
-goal_stmt = "GOAL" ":" text ;
+(* Basic Elements *)
+program = {statement};
+statement = task_statement | action_statement | goal_statement | class_definition | function_definition | api_call | if_statement | loop_statement | error_handling | llm_reference;
 
-if_stmt = "IF" condition "THEN" block [ "ELSE" block ] ;
-for_stmt = "FOR EACH" identifier "IN" identifier block ;
+(* TAG Core *)
+task_statement = "TASK:" string_literal;
+action_statement = "ACTION:" string_literal;
+goal_statement = "GOAL:" string_literal;
 
-class_def = "CLASS" identifier class_block ;
-class_block = { property_def } ;
-property_def = identifier ":" type ;
+(* Classes and Functions *)
+class_definition = "CLASS" identifier class_body;
+class_body = "{" {class_member} "}";
+class_member = field_declaration | method_declaration;
+field_declaration = identifier ":" type_annotation;
+method_declaration = "DEFINE" "FUNCTION" identifier "(" parameter_list ")" function_body;
+parameter_list = [identifier {"," identifier}];
+function_body = "{" {statement} "}";
 
-function_def = "DEFINE FUNCTION" identifier "(" [ param_list ] ")" block ;
-param_list = identifier { "," identifier } ;
+(* Function Calls *)
+function_call = "CALL" identifier "(" argument_list ")";
+argument_list = [expression {"," expression}];
 
-function_call = "CALL" identifier "(" [ arg_list ] ")" ;
-arg_list = value { "," value } ;
+(* API Integration *)
+api_call = "CALL" "API" identifier "." identifier ["WITH" json_object];
+json_object = "{" [json_pair {"," json_pair}] "}";
+json_pair = string_literal ":" expression;
 
-trigger_stmt = "ON" event_pattern block ;
+(* External Connections *)
+connection = "CONNECT" "TO" identifier "AS" identifier connection_config;
+connection_config = "{" connection_property {"," connection_property} "}";
+connection_property = string_literal ":" (string_literal | env_call);
+env_call = "ENV(" string_literal ")";
 
-import_stmt = "IMPORT" string ;
+(* Control Flow *)
+if_statement = "IF" condition "THEN" statement_block ["ELSE" statement_block];
+condition = expression comparison_operator expression;
+comparison_operator = "=" | "!=" | "<" | ">" | "<=" | ">=";
+statement_block = statement | "{" {statement} "}";
 
-connect_stmt = "CONNECT TO" tool_type "AS" identifier connect_options ;
-tool_type = "n8n" | "webhook" | "api" | "queue" | "db" ;
-connect_options = "{" { connect_option } "}" ;
-connect_option = identifier ":" value ;
+loop_statement = "FOR" "EACH" identifier "IN" expression "DO" statement_block;
+loop_guard = "LOOPGUARD" "{" loop_config "}";
+loop_config = "max_depth:" number "," "allow_repeat:" boolean;
 
-webhook_stmt = "TRIGGER WEBHOOK" identifier "WITH" payload ;
-api_stmt = "CALL API" identifier "." endpoint "WITH" payload ;
+(* Error Handling *)
+error_handling = "ON" "ERROR" statement_block;
 
-payload = "{" { identifier ":" value } "}" ;
-endpoint = identifier ;
+(* LLM References - NEW *)
+llm_reference = "@" llm_resource [llm_parameters];
+llm_resource = llm_tool | llm_file | llm_project | llm_database;
+llm_tool = "tool:" identifier;
+llm_file = "file:" file_path;
+llm_project = "project:" project_identifier;
+llm_database = "db:" database_identifier;
+llm_parameters = "{" parameter_assignment {"," parameter_assignment} "}";
+parameter_assignment = identifier ":" expression;
+file_path = string_literal;
+project_identifier = identifier;
+database_identifier = identifier;
 
-block = { statement } ;
+(* Data Types *)
+type_annotation = "string" | "int" | "float" | "bool" | "array" | "object";
+expression = literal | identifier | function_call | llm_reference;
+literal = string_literal | number | boolean;
+string_literal = '"' {character} '"';
+number = integer | float;
+integer = digit {digit};
+float = integer "." integer;
+boolean = "true" | "false";
 
-condition = identifier comparator value ;
-comparator = "=" | "!=" | "<" | ">" | "<=" | ">=" ;
+(* Identifiers *)
+identifier = letter {letter | digit};
+letter = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" | "_";
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9";
+character = letter | digit | " " | "!" | "#" | "$" | "%" | "&" | "'" | "(" | ")" | "*" | "+" | "," | "-" | "." | "/" | ":" | ";" | "<" | "=" | ">" | "?" | "@" | "[" | "\" | "]" | "^" | "_" | "`" | "{" | "|" | "}" | "~";
 
-identifier = letter { letter | digit | "_" } ;
-type = "string" | "int" | "float" | "bool" ;
-value = string | number | identifier ;
-
-event_pattern = string | regex ;
-
-text = string ;
-string = '"' { character } '"' ;
-number = [ "-" ] digit { digit } ;
-digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
-letter = "A" .. "Z" | "a" .. "z" ;
-character = ? any printable character except " ? ;
-regex = "/" { character } "/" ;
+(* Comments *)
+comment = "#" {character} newline;
+newline = ? ASCII 10 ?;

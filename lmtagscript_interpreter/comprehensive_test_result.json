@@ -1,0 +1,312 @@
+{
+  "task": "Gerar relatório final",
+  "action": "Consolidar todos os dados e insights",
+  "goal": "Entregar relatório executivo completo",
+  "for_loop": {
+    "variable": "lead",
+    "collection": "@db:crm_database.leads"
+  },
+  "error_handling": true,
+  "if_blocks": [
+    {
+      "condition": {
+        "left": "data_quality_score >",
+        "operator": "=",
+        "right": "0.8"
+      },
+      "then": "",
+      "else": ""
+    }
+  ],
+  "api_calls": [
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "openai.chat"
+      },
+      "payload": {}
+    },
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "claude.analyze"
+      },
+      "payload": {}
+    },
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "openai.analyze"
+      },
+      "payload": {}
+    }
+  ],
+  "llm_references": [
+    {
+      "type": "tool",
+      "tool": "google_drive",
+      "parameters": {
+        "action": "list_files",
+        "folder": "1ABC123DEF456",
+        "filter": "pdf",
+        "max_results": "50"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "spreadsheet",
+      "parameters": {
+        "operation": "create",
+        "template": "sales_report_v2",
+        "title": "Relatório de Vendas - \" + current_month"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "email_service",
+      "parameters": {
+        "template": "sales_summary",
+        "recipients": "[\"vendas@empresa.com",
+        "subject": "Relatório Semanal de Vendas"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "data_analyzer",
+      "parameters": {
+        "algorithm": "trend_analysis",
+        "time_period": "last_30_days",
+        "metrics": "[\"revenue"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/config/sales_settings.json",
+      "parameters": {
+        "permission": "read",
+        "format": "json"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/templates/sales_report_template.xlsx",
+      "parameters": {
+        "copy_to": "/reports/",
+        "name": "relatorio_vendas_\" + current_date",
+        "preserve_formatting": "true"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/data/historical_sales.csv",
+      "parameters": {
+        "permission": "read",
+        "format": "csv",
+        "encoding": "utf-8"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/output/processed_data.json",
+      "parameters": {
+        "permission": "write",
+        "format": "json",
+        "compress": "true"
+      }
+    },
+    {
+      "type": "project",
+      "project": "analytics_dashboard",
+      "parameters": {
+        "access": "read",
+        "include": "[\"charts",
+        "exclude": "[\"raw_data"
+      }
+    },
+    {
+      "type": "project",
+      "project": "sales_crm",
+      "parameters": {
+        "access": "read_write",
+        "components": "[\"leads",
+        "sync_frequency": "real_time"
+      }
+    },
+    {
+      "type": "project",
+      "project": "lmtagscript",
+      "parameters": {
+        "access": "read",
+        "include": "[\"docs",
+        "format": "markdown"
+      }
+    },
+    {
+      "type": "database",
+      "database": "sales_database",
+      "parameters": {
+        "query": "SELECT * FROM sales WHERE date >= '2024-01-01' AND status = 'completed'",
+        "limit": "1000",
+        "order_by": "date DESC"
+      }
+    },
+    {
+      "type": "database",
+      "database": "analytics_db",
+      "parameters": {
+        "operation": "update",
+        "table": "sales_metrics",
+        "where": "period = 'current_month'",
+        "values": "{    \"total_revenue\": calculated_revenue",
+        "avg_deal_size": "avg_deal",
+        "conversion_rate": "conversion_rate"
+      }
+    },
+    {
+      "type": "database",
+      "database": "crm_database",
+      "parameters": {
+        "operation": "insert",
+        "table": "leads",
+        "values": "{    \"name\": lead_name",
+        "email": "lead_email",
+        "source": "automated_report",
+        "created_at": "current_timestamp"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:data_processor",
+      "parameters": {
+        "operation": "clean_and_validate",
+        "input": "@db:sales_database",
+        "output": "@file:\"/processed/clean_data.json"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:ml_analyzer",
+      "parameters": {
+        "model": "sales_prediction",
+        "features": "[\"revenue",
+        "output": "@project:analytics_dashboard"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:data_collector",
+      "parameters": {
+        "sources": "[\"crm",
+        "timeframe": "last_7_days"
+      }
+    },
+    {
+      "type": "file",
+      "path": "e:\"/logs/data_quality_issues.log",
+      "parameters": {
+        "permission": "write",
+        "append": "true",
+        "timestamp": "true"
+      }
+    },
+    {
+      "type": "file",
+      "path": "e:file.path",
+      "parameters": {
+        "extract_text": "true",
+        "save_to": "/processed/files/",
+        "metadata": "{      \"original_name\": file.name",
+        "processed_at": "current_timestamp",
+        "file_size": "file.size    }"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:lead_scorer",
+      "parameters": {
+        "lead_id": "lead.id",
+        "criteria": "[\"engagement",
+        "output": "@db:crm_database"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:backup_storage",
+      "parameters": {
+        "operation": "retrieve",
+        "fallback": "true",
+        "data_type": "sales_data"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:email_service",
+      "parameters": {
+        "template": "error_notification",
+        "recipients": "[\"tech@empresa.com",
+        "priority": "high",
+        "include_logs": "true"
+      }
+    },
+    {
+      "type": "file",
+      "path": "e:\"/logs/error_log.json",
+      "parameters": {
+        "permission": "write",
+        "append": "true",
+        "include_stack_trace": "true"
+      }
+    },
+    {
+      "type": "project",
+      "project": "t:analytics_dashboard",
+      "parameters": {
+        "status": "error",
+        "last_error": "error_message",
+        "recovery_attempts": "recovery_count"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/reports/sales_report_final.pdf",
+      "parameters": {
+        "permission": "write",
+        "format": "pdf",
+        "template": "executive_summary"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "email_service",
+      "parameters": {
+        "template": "final_report",
+        "recipients": "[\"ceo@empresa.com",
+        "attachments": "[\"@file:/reports/sales_report_final.pdf\"]"
+      }
+    },
+    {
+      "type": "project",
+      "project": "analytics_dashboard",
+      "parameters": {
+        "status": "completed",
+        "last_updated": "current_timestamp",
+        "next_run": "next_scheduled_run"
+      }
+    },
+    {
+      "type": "database",
+      "database": "reports_database",
+      "parameters": {
+        "operation": "insert",
+        "table": "generated_reports",
+        "values": "{    \"report_type\": \"sales_analysis",
+        "generated_at": "current_timestamp",
+        "file_path": "@file:/reports/sales_report_final.pdf",
+        "status": "delivered"
+      }
+    }
+  ]
+}

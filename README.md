@@ -157,6 +157,19 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
 
 Se este projeto foi útil para você, considere dar uma estrela ⭐ no GitHub!
 
+## 🚀 Sponsor o Projeto
+
+Apoie o desenvolvimento do LMTagScript e ajude a construir a linguagem universal para orquestração de IA!
+
+### 💰 Formas de Apoio
+
+- **PayPal:** alex@marramoncks.com.br
+- **Wise:** [https://wise.com/pay/me/alexanderm5339](https://wise.com/pay/me/alexanderm5339)
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-LMTagScript-red?style=for-the-badge)](SPONSOR.md)
+
+Veja mais detalhes em [SPONSOR.md](SPONSOR.md)
+
 ---
 
 **LMTagScript** - Orquestrando IA com clareza e controle. 

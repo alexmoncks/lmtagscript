@@ -1,0 +1,111 @@
+openapi: 3.1.0
+info:
+  title: LMTagScript API
+  version: 0.1.0
+  description: API para validar, compilar e executar LMTagScript.
+servers:
+  - url: https://api.seu-host.com
+paths:
+  /validate:
+    post:
+      summary: Valida um documento LMTagScript
+      operationId: validate
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source:
+                  type: string
+              required: [source]
+      responses:
+        '200':
+          description: Resultado da validação
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  diagnostics:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message: { type: string }
+                        line: { type: integer }
+                        col: { type: integer }
+                        code: { type: string }
+                        severity: { type: string, enum: [error, warning] }
+        '400': { description: Bad Request }
+  /compile:
+    post:
+      summary: Compila LMTagScript em AST + JSON
+      operationId: compile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source: { type: string }
+              required: [source]
+      responses:
+        '200':
+          description: AST e JSON gerados
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ast: { }
+                  json: { }
+                  warnings:
+                    type: array
+                    items: { type: string }
+        '400': { description: Bad Request }
+  /run:
+    post:
+      summary: Executa LMTagScript com contexto opcional
+      operationId: run
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                source: { type: string }
+                options:
+                  type: object
+                  properties:
+                    ctx: { type: object }
+              required: [source]
+      responses:
+        '200':
+          description: Logs e resultado da execução
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  logs:
+                    type: array
+                    items: { type: string }
+                  result: { }
+        '400': { description: Bad Request }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

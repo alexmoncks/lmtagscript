@@ -1,0 +1,18 @@
+{
+  "name": "@lmtagscript/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "lmtag": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@lmtagscript/core": "workspace:*",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.2"
+  }
+}

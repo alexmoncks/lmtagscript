@@ -1,0 +1,81 @@
+{
+  "task": "Provide robust fallback visuals and notes",
+  "action": "",
+  "goal": "Maintain clarity, trust, and accessibility",
+  "error_handling": true,
+  "if_blocks": [
+    {
+      "condition": {
+        "type": "comparison",
+        "left": "question",
+        "operator": "=",
+        "right": "\"comparison\""
+      },
+      "then": "Return \"bar/column\"\n",
+      "else": "Return \"stacked/pie/treemap\"\nReturn \"histogram/box/scatter\"\nReturn \"scatter/bubble/network\"\nReturn \"line/area/gantt\"\nReturn \"choropleth/symbol/flow\"\n",
+      "line_number": 133
+    },
+    {
+      "condition": {
+        "type": "comparison",
+        "left": "intent",
+        "operator": "=",
+        "right": "\"urgency\""
+      },
+      "then": "",
+      "else": "",
+      "line_number": 151
+    },
+    {
+      "condition": {
+        "type": "comparison",
+        "left": "request.type",
+        "operator": "=",
+        "right": "\"onboarding\""
+      },
+      "then": "CALL example_onboarding()\n",
+      "else": "CALL example_pitch_deck()\nCALL example_infographic()\nCALL example_algorithm_explainer()\nCALL visualNarrativeDesign(request.context)\n",
+      "line_number": 225
+    }
+  ],
+  "llm_references": [
+    {
+      "type": "tool",
+      "tool": "WebSearch",
+      "parameters": {
+        "query": "visual metaphor examples for recommendation systems",
+        "limit": 5
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "WebFetch",
+      "parameters": {
+        "url": "https://example.com/brand/visual-guidelines.pdf"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "Write",
+      "parameters": {
+        "mode": "outline",
+        "target": "storyboard"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "MultiEdit",
+      "parameters": {
+        "operation": "apply_style",
+        "style": "brand-consistent"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "Read",
+      "parameters": {
+        "path": "/data/key_metrics.json"
+      }
+    }
+  ]
+}

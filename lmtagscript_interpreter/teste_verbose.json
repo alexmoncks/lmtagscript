@@ -1,0 +1,71 @@
+{
+  "task": "Check availability",
+  "action": "Query inventory system",
+  "goal": "Determine stock level",
+  "error_handling": true,
+  "if_blocks": [
+    {
+      "condition": {
+        "type": "comparison",
+        "left": "stock_available",
+        "operator": "=",
+        "right": "true"
+      },
+      "then": "",
+      "else": "",
+      "line_number": 17
+    }
+  ],
+  "api_calls": [
+    {
+      "type": "llm_api",
+      "reference": {
+        "type": "tool",
+        "tool": "openai.chat"
+      },
+      "payload": {}
+    }
+  ],
+  "llm_references": [
+    {
+      "type": "tool",
+      "tool": "google_drive",
+      "parameters": {
+        "action": "list_files",
+        "folder": "1ABC123DEF456"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/meu-projeto/documentos/relatorio-vendas.pdf",
+      "parameters": {
+        "permission": "read",
+        "format": "text"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:payment_processor",
+      "parameters": {
+        "operation": "charge",
+        "amount": 99.99
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:email_service",
+      "parameters": {
+        "template": "out_of_stock",
+        "recipient": "user_email"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:backup_storage",
+      "parameters": {
+        "operation": "retrieve",
+        "fallback": "true"
+      }
+    }
+  ]
+}

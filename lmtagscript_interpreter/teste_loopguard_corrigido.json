@@ -1,0 +1,27 @@
+{
+  "task": [
+    "Testar LOOPGUARD"
+  ],
+  "action": [
+    "Verificar parsing"
+  ],
+  "goal": [
+    "Validar detecção"
+  ],
+  "loop_guards": [
+    {
+      "max_depth": 10,
+      "allow_repeat": "false",
+      "timeout": 300
+    },
+    {
+      "max_depth": 5,
+      "allow_repeat": true
+    },
+    {
+      "max_depth": 3,
+      "allow_repeat": false,
+      "debug": true
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "task": [
+    "Testar funcionalidades do parser",
+    "Processar urgente",
+    "Processar normal",
+    "Processar item",
+    "Fallback"
+  ],
+  "action": [
+    "Executar exemplos de todas as estruturas",
+    "Notificar equipe",
+    "Adicionar à fila",
+    "Validar dados",
+    "Log error"
+  ],
+  "goal": [
+    "Validar parsing completo",
+    "Resolver imediatamente",
+    "Processar quando possível",
+    "Garantir qualidade",
+    "Continuar operação"
+  ],
+  "for_loop": {
+    "variable": "item",
+    "collection": "items"
+  },
+  "error_handling": true,
+  "if_blocks": [
+    {
+      "condition": {
+        "type": "logical",
+        "operator": "AND",
+        "left": {
+          "type": "comparison",
+          "left": "status",
+          "operator": "=",
+          "right": "\"active\""
+        },
+        "right": {
+          "type": "comparison",
+          "left": "priority",
+          "operator": ">",
+          "right": "5"
+        }
+      },
+      "then": "",
+      "else": "",
+      "line_number": 28
+    }
+  ],
+  "llm_references": [
+    {
+      "type": "tool",
+      "tool": "test_tool",
+      "parameters": {
+        "param1": "valor1",
+        "param2": 42,
+        "param3": "true"
+      }
+    },
+    {
+      "type": "file",
+      "path": "/caminho/arquivo.txt",
+      "parameters": {
+        "permission": "read",
+        "encoding": "utf-8"
+      }
+    },
+    {
+      "type": "project",
+      "project": "meu_projeto",
+      "parameters": {
+        "access": "read_write",
+        "components": "[\"core"
+      }
+    },
+    {
+      "type": "database",
+      "database": "test_database",
+      "parameters": {
+        "query": "SELECT * FROM users",
+        "limit": 100
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:notification",
+      "parameters": {
+        "type": "urgent",
+        "recipients": "[\"admin@empresa.com\"]"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "l:logger",
+      "parameters": {
+        "level": "error",
+        "message": "Erro detectado"
+      }
+    }
+  ],
+  "calls": [
+    {
+      "function": "API",
+      "arguments": "",
+      "line_number": 44
+    }
+  ]
+}

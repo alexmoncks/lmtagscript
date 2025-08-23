@@ -10,12 +10,14 @@
   "if_blocks": [
     {
       "condition": {
+        "type": "comparison",
         "left": "data_quality_score >",
         "operator": "=",
         "right": "0.8"
       },
       "then": "",
-      "else": ""
+      "else": "",
+      "line_number": 137
     }
   ],
   "api_calls": [
@@ -52,7 +54,7 @@
         "action": "list_files",
         "folder": "1ABC123DEF456",
         "filter": "pdf",
-        "max_results": "50"
+        "max_results": 50
       }
     },
     {
@@ -149,7 +151,7 @@
       "database": "sales_database",
       "parameters": {
         "query": "SELECT * FROM sales WHERE date >= '2024-01-01' AND status = 'completed'",
-        "limit": "1000",
+        "limit": 1000,
         "order_by": "date DESC"
       }
     },

@@ -1,0 +1,204 @@
+{
+  "task": [
+    "Define the Visual Storyteller agent",
+    "Provide robust fallback visuals and notes"
+  ],
+  "action": [
+    "Declare agent metadata, capabilities, tools and reusable functions",
+    ""
+  ],
+  "goal": [
+    "Transform complex ideas into compelling visual narratives across formats",
+    "Correct visual grammar",
+    "Align emotion and meaning",
+    "Deliver a clear, beautiful, and accessible visual story",
+    "Maintain clarity, trust, and accessibility"
+  ],
+  "error_handling": true,
+  "llm_references": [
+    {
+      "type": "tool",
+      "tool": "WebSearch",
+      "parameters": {
+        "query": "visual metaphor examples for recommendation systems",
+        "limit": 5
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "WebFetch",
+      "parameters": {
+        "url": "https://example.com/brand/visual-guidelines.pdf"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "Write",
+      "parameters": {
+        "mode": "outline",
+        "target": "storyboard"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "MultiEdit",
+      "parameters": {
+        "operation": "apply_style",
+        "style": "brand-consistent"
+      }
+    },
+    {
+      "type": "tool",
+      "tool": "Read",
+      "parameters": {
+        "path": "/data/key_metrics.json"
+      }
+    }
+  ],
+  "functions": [
+    {
+      "name": "visualNarrativeDesign",
+      "task": "Design a sequential visual story",
+      "action": "",
+      "goal": "A storyboard (frames + notes) ready for illustration and motion",
+      "line_number": 55
+    },
+    {
+      "name": "dataVisualization",
+      "task": "Turn data into clear visuals",
+      "action": "",
+      "goal": "A data-vis brief (chart list, encodings, annotations, interactions)",
+      "line_number": 64
+    },
+    {
+      "name": "createInfographic",
+      "task": "Distill information hierarchically",
+      "action": "",
+      "goal": "Infographic layout spec + asset list",
+      "line_number": 73
+    },
+    {
+      "name": "presentationDesign",
+      "task": "Craft persuasive slide narratives",
+      "action": "",
+      "goal": "Slide map + master styles + motion notes",
+      "line_number": 81
+    },
+    {
+      "name": "illustrationSystem",
+      "task": "Develop a cohesive visual language",
+      "action": "",
+      "goal": "Illustration style guide + component library outline",
+      "line_number": 89
+    },
+    {
+      "name": "motionAndInteraction",
+      "task": "Add meaningful motion",
+      "action": "",
+      "goal": "Motion spec (timing 200–400ms, easing, states, exits)",
+      "line_number": 97
+    },
+    {
+      "name": "storyStructureTemplate",
+      "task": "Provide a reusable narrative scaffold",
+      "action": "Return \"\"\"",
+      "goal": "Speed up story planning",
+      "line_number": 109
+    },
+    {
+      "name": "infographicPatterns",
+      "task": "Offer layout options",
+      "action": "Return \"\"\"",
+      "goal": "Accelerate composition",
+      "line_number": 120
+    },
+    {
+      "name": "chooseChartType",
+      "task": "Map analytical question to chart family",
+      "action": "",
+      "goal": "",
+      "line_number": 130
+    },
+    {
+      "name": "colorPsychologyIntent",
+      "task": "Suggest palette direction by intent",
+      "action": "",
+      "goal": "",
+      "line_number": 148
+    },
+    {
+      "name": "accessibilityChecklist",
+      "task": "Provide A11y validation steps",
+      "action": "Return [\"contrast\", \"scalable_text\", \"pause_motion\", \"alt_text\", \"no_color_only\", \"keyboard_access\"]",
+      "goal": "Ensure inclusive visuals",
+      "line_number": 162
+    },
+    {
+      "name": "testVisualStory",
+      "task": "Provide QA tests",
+      "action": "Return [\"5-second\", \"squint\", \"grayscale\", \"mobile\", \"culture\", \"accessibility\"]",
+      "goal": "Validate comprehension quickly",
+      "line_number": 167
+    },
+    {
+      "name": "example_onboarding",
+      "task": "Explain how an AI journaling app works visually",
+      "action": "",
+      "goal": "Engaging onboarding sequence that simplifies AI concepts",
+      "line_number": 177
+    },
+    {
+      "name": "example_pitch_deck",
+      "task": "Show growth trajectory and vision",
+      "action": "",
+      "goal": "Compelling deck that supports funding conversations",
+      "line_number": 185
+    },
+    {
+      "name": "example_infographic",
+      "task": "Visualize \"saves users 2 hours/week\"",
+      "action": "",
+      "goal": "Clear, shareable infographic for social",
+      "line_number": 193
+    },
+    {
+      "name": "example_algorithm_explainer",
+      "task": "Demystify recommendation system",
+      "action": "",
+      "goal": "Build trust via approachable explanation",
+      "line_number": 201
+    },
+    {
+      "name": "run",
+      "task": "Select the right pipeline by intent",
+      "action": "",
+      "goal": "",
+      "line_number": 222
+    }
+  ],
+  "classes": [
+    {
+      "name": "Agent",
+      "properties": {
+        "name": "\"visual-storyteller\"",
+        "description": "\"Create visual narratives, infographics, decks, and visual explanations that make complexity clear and engaging.\"",
+        "color": "\"cyan\"",
+        "tools": "[\"Write\", \"Read\", \"MultiEdit\", \"WebSearch\", \"WebFetch\"]   # logical tool names; map to platform tools"
+      },
+      "methods": [],
+      "line_number": 8
+    }
+  ],
+  "calls": [
+    {
+      "function": "accessibilityChecklist",
+      "arguments": "",
+      "line_number": 238
+    },
+    {
+      "function": "testVisualStory",
+      "arguments": "",
+      "line_number": 239
+    }
+  ]
+}
